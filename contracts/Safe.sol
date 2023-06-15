@@ -151,8 +151,10 @@ contract Safe is
         bytes32 txHash;
         // Use scope here to limit variable lifetime and prevent `stack too deep` errors
         {
-            bytes memory txHashData = encodeTransactionData(
-                // Transaction info
+            // Increase nonce and execute transaction.
+            nonce++;
+
+            txHash = getTransactionHash( // Transaction info
                 to,
                 value,
                 data,
@@ -166,10 +168,7 @@ contract Safe is
                 // Signature info
                 nonce
             );
-            // Increase nonce and execute transaction.
-            nonce++;
-            txHash = keccak256(txHashData);
-            checkSignatures(txHash, txHashData, signatures);
+            checkSignatures(txHash, "0x", signatures);
         }
         address guard = getGuard();
         {
@@ -270,7 +269,13 @@ contract Safe is
      *                   Can be packed ECDSA signature ({bytes32 r}{bytes32 s}{uint8 v}), contract signature (EIP-1271) or approved hash.
      * @param requiredSignatures Amount of required valid signatures.
      */
-    function checkNSignatures(address executor, bytes32 dataHash, bytes memory /* data */, bytes memory signatures, uint256 requiredSignatures) public view {
+    function checkNSignatures(
+        address executor,
+        bytes32 dataHash,
+        bytes memory /* data */,
+        bytes memory signatures,
+        uint256 requiredSignatures
+    ) public view {
         // Check that the provided signature data is not too short
         require(signatures.length >= requiredSignatures.mul(65), "GS020");
         // There cannot be an owner with address 0.
