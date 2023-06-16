@@ -168,7 +168,7 @@ contract Safe is
                 // Signature info
                 nonce
             );
-            checkSignatures(txHash, "0x", signatures);
+            checkSignatures(txHash, "", signatures);
         }
         address guard = getGuard();
         {
