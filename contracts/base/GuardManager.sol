@@ -6,6 +6,18 @@ import "../common/SelfAuthorized.sol";
 import "../interfaces/IERC165.sol";
 
 interface Guard is IERC165 {
+    /// @dev Checks if a transaction should be allowed.
+    /// @param to The address of the recipient.
+    /// @param value The value of the transaction.
+    /// @param data The data of the transaction.
+    /// @param operation The operation type. 0 - CALL, 1 - DELEGATECALL
+    /// @param safeTxGas The gas limit for the transaction.
+    /// @param baseGas The base gas limit for the transaction.
+    /// @param gasPrice The gas price for the transaction.
+    /// @param gasToken The token used for paying gas.
+    /// @param refundReceiver The address that will receive the gas fees refund.
+    /// @param signatures The signatures of the transaction.
+    /// @param msgSender The sender of the message that triggered the transaction.
     function checkTransaction(
         address to,
         uint256 value,
@@ -20,9 +32,19 @@ interface Guard is IERC165 {
         address msgSender
     ) external;
 
-    function checkModuleTransaction(address to, uint256 value, bytes memory data, Enum.Operation operation, address msgSender) external;
+    /// @dev Checks if a module transaction should be allowed.
+    /// @param to The address of the recipient.
+    /// @param value The value of the transaction.
+    /// @param data The data of the transaction.
+    /// @param operation The operation type.
+    /// @param module The module that triggered the transaction.
+    function checkModuleTransaction(address to, uint256 value, bytes memory data, Enum.Operation operation, address module) external;
 
-    function checkAfterExecution(bytes32 txHash, bool success) external;
+    /// @dev Checks if a transaction was successful after execution.
+    /// @param hash The hash of the transaction that was executed.
+    ///        In a module transaction, hash of the transaction call data.
+    /// @param success Whether or not the transaction was successful.
+    function checkAfterExecution(bytes32 hash, bool success) external;
 }
 
 abstract contract BaseGuard is Guard {
